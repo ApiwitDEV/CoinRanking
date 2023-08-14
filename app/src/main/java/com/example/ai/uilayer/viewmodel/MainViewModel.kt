@@ -3,15 +3,14 @@ package com.example.ai.uilayer.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.ai.datalayer.repositories.Repository
 import com.example.ai.uilayer.uistatemodel.CoinUIStateModel
+import kotlinx.coroutines.launch
 
 class MainViewModel constructor(
     private val repository: Repository
 ): ViewModel() {
-
-    private val _showToastSuccess = MutableLiveData<Unit>()
-    val showToastSuccess: LiveData<Unit> = _showToastSuccess
 
     private val _isShowToast = MutableLiveData<String>()
     val isShowToast: LiveData<String> = _isShowToast
@@ -33,18 +32,19 @@ class MainViewModel constructor(
     }
 
     fun getCoinList(search: String = "") {
-        repository.getCoinList(
-            offset = 0,
-            limit = 100,
-            search = search,
-            handleUIStateWhenSuccess = {
-//                _showToastSuccess.value = Unit
-                setCoinList()
-            },
-            handleUIStateWhenFailure = { failMessage ->
-                handleFailure("Fail : $failMessage")
-            }
-        )
+        viewModelScope.launch {
+            repository.getCoinList(
+                offset = 0,
+                limit = 100,
+                search = search,
+                handleUIStateWhenSuccess = {
+                    setCoinList()
+                },
+                handleUIStateWhenFailure = { failMessage ->
+                    handleFailure("Fail : $failMessage")
+                }
+            )
+        }
     }
 
     private fun setCoinList() {
@@ -54,8 +54,10 @@ class MainViewModel constructor(
                     _clickedItem.value = coin
                 },
                 handleOnClickBookmarkEvent = { uuid: String ->
-                    repository.bookmarkCoin(uuid) {
-                        setCoinList()
+                    viewModelScope.launch {
+                        repository.bookmarkCoin(uuid) {
+                            setCoinList()
+                        }
                     }
                 }
             )

@@ -1,18 +1,13 @@
 package com.example.ai.uilayer.ui.main
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.widget.SearchView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.ai.R
 import com.example.ai.databinding.ActivityMainBinding
-import com.example.ai.uilayer.ui.detail.CoinDetailActivity
 import com.example.ai.uilayer.uistatemodel.CoinUIStateModel
 import com.example.ai.uilayer.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -121,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 //            coinList.observe(this@MainActivity) {
 //                coinListAdapter.itemList = it
 //                coinListAdapter.notifyDataSetChanged()
-//            }
+//            } X
             isShowToast.observe(this@MainActivity) {
                 Toast.makeText(baseContext, it, Toast.LENGTH_LONG).show()
             }

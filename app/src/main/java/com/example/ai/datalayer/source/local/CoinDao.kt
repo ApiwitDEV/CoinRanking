@@ -7,11 +7,11 @@ import com.example.ai.datalayer.source.local.entity.FavoriteCoinEntity
 interface CoinDao {
 
     @Query("SELECT * FROM FavoriteCoin")
-    fun getFavoriteCoin(): List<FavoriteCoinEntity>
+    suspend fun getFavoriteCoin(): List<FavoriteCoinEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(favoriteCoin: FavoriteCoinEntity)
+    suspend fun insert(favoriteCoin: FavoriteCoinEntity)
 
     @Delete
-    fun delete(favoriteCoin: FavoriteCoinEntity)
+    suspend fun delete(favoriteCoin: FavoriteCoinEntity)
 }

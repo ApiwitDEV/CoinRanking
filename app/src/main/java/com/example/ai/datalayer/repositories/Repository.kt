@@ -3,40 +3,33 @@ package com.example.ai.datalayer.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ai.datalayer.model.CoinRankingResponse
+import com.example.ai.datalayer.source.remote.network.RequestHandler
 import com.example.ai.datalayer.source.local.CoinRoomDatabase
 import com.example.ai.datalayer.source.local.entity.FavoriteCoinEntity
-import com.example.ai.datalayer.source.remote.CoinRankingService
-import kotlin.concurrent.fixedRateTimer
+import com.example.ai.datalayer.source.remote.network.CoinRankingService
 
 class Repository constructor(
     private val coinRankingService: CoinRankingService,
     private val favoriteCoinRoomDatabase: CoinRoomDatabase
 ) {
 
-    private val apiKey = "coinranking49246176de07b17763f685360c399d6097bc8d20d6a1aa09"
-
     private val _coinData = MutableLiveData<CoinRankingResponse>()
     val coinData: LiveData<CoinRankingResponse> = _coinData
 
-    fun getCoinList(
+    suspend fun getCoinList(
         offset: Int,
         limit: Int,
         search: String = "",
         handleUIStateWhenSuccess: () -> Unit,
         handleUIStateWhenFailure: (String) -> Unit
     ) {
-        RequestHandler.call(
-            call = coinRankingService.getCoinList(apiKey, offset, limit, search),
-            onSuccess = { coinRankingResponse: CoinRankingResponse ->
-                mapBookmarkedStateToCoinList(
-                    coinRankingResponse,
-                    getBookmarkedCoin()
-                )
+        RequestHandler.fetchDataFromNetwork(
+            endPoint = coinRankingService.getCoinList(offset, limit, search),
+            onSuccess = { coinRankingResponse ->
+                mapBookmarkedStateToCoinList(coinRankingResponse, getBookmarkedCoin())
                 handleUIStateWhenSuccess()
             },
-            onFailure = { failMessage ->
-                handleUIStateWhenFailure(failMessage)
-            }
+            onFailure = handleUIStateWhenFailure
         )
     }
 
@@ -60,11 +53,11 @@ class Repository constructor(
         _coinData.value = coinRankingResponse
     }
 
-    private fun getBookmarkedCoin(): List<FavoriteCoinEntity> {
+    private suspend fun getBookmarkedCoin(): List<FavoriteCoinEntity> {
         return favoriteCoinRoomDatabase.coinDao().getFavoriteCoin()
     }
 
-    fun bookmarkCoin(
+    suspend fun bookmarkCoin(
         uuid: String,
         updateCoinListUIState: () -> Unit
     ) {

@@ -1,6 +1,6 @@
-package com.example.ai.datalayer.repositories
+package com.example.ai.datalayer.source.remote.network
 
-import com.example.ai.datalayer.model.CoinRankingResponse
+import kotlinx.coroutines.withTimeout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,5 +28,19 @@ object RequestHandler {
                 onFailure(t.message?:"")
             }
         })
+    }
+
+    suspend fun <T: Any> fetchDataFromNetwork(
+        endPoint: T,
+        onSuccess: suspend (T) -> Unit,
+        onFailure: suspend (status: String) -> Unit
+    ) {
+        try {
+            withTimeout(5000) {
+                onSuccess(endPoint)
+            }
+        } catch (error: Exception) {
+            onFailure(error.message.toString())
+        }
     }
 }

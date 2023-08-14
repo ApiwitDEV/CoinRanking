@@ -25,7 +25,7 @@ abstract class CoinRoomDatabase : RoomDatabase() {
                         "CoinDatabase"
                     )
                         .fallbackToDestructiveMigration()
-                        .allowMainThreadQueries()
+                        //.allowMainThreadQueries()
                         .build()
                     INSTANCE = instance
                 }
