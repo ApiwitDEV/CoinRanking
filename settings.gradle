@@ -15,5 +15,8 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AI"
 include ':app'
-include ':DomainLayer'
-include ':DataLayer'
+include ':Data'
+include ':Common'
+include ':Common:Domain'
+include ':Feature'
+include ':Feature:CoinRankingFeature'

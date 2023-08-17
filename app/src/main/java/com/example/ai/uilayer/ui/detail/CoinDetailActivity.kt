@@ -4,13 +4,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.ai.databinding.ActivityCoinDetailBinding
-import com.example.ai.uilayer.viewmodel.DetailViewModel
+import com.example.coinrankingfeature.viewmodel.DetailViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CoinDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCoinDetailBinding
-    private val viewModel by viewModel<DetailViewModel>()
+    private val viewModel by viewModel<com.example.coinrankingfeature.viewmodel.DetailViewModel>()
 
     var uuid = ""
 

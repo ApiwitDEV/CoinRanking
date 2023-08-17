@@ -1,23 +1,15 @@
 package com.example.ai.uilayer.ui.main
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.widget.SearchView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.ai.R
 import com.example.ai.databinding.ActivityMainBinding
-import com.example.ai.uilayer.uistatemodel.CoinUIStateModel
-import com.example.ai.uilayer.viewmodel.MainViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModel()
+//    private val viewModel: com.example.coinrankingfeature.viewmodel.MainViewModel by viewModel()
 
-    private val coinListAdapter by lazy { CoinListAdapter(listOf()) }
+//    private val coinListAdapter by lazy { com.example.coinrankingfeature.ui.CoinListAdapter(listOf()) }
 
 //    private val requestPermissionLauncher =
 //        registerForActivityResult(
@@ -42,11 +34,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
+//        supportFragmentManager.commit {
+//            replace<CoinListFragment>(R.id.fragment_container)
+//            setReorderingAllowed(true)
+//            addToBackStack(null)
+//        }
         setContentView(view)
 //        checkPermission()
-        observeViewModel()
-        initView()
-        onViewModelObserved()
+//        observeViewModel()
+//        initView()
+//        onViewModelObserved()
 //        if (savedInstanceState == null) {
 //            supportFragmentManager.beginTransaction()
 //                .replace(R.id.container, MainFragment.newInstance())
@@ -92,62 +89,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-    }
-
-    private fun initView() {
-        binding.floatingBookmarkFilterButton.setOnClickListener {
-            viewModel.showOnlyBookmarkedCoin()
-        }
-        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(p0: String?): Boolean {
-                viewModel.getCoinList(p0?:"")
-                return false
-            }
-        })
-        binding.rvCoinList.adapter = coinListAdapter
-    }
-
-    private fun observeViewModel() {
-        viewModel.apply {
-//            coinList.observe(this@MainActivity) {
-//                coinListAdapter.itemList = it
-//                coinListAdapter.notifyDataSetChanged()
-//            } X
-            isShowToast.observe(this@MainActivity) {
-                Toast.makeText(baseContext, it, Toast.LENGTH_LONG).show()
-            }
-            clickedItem.observe(this@MainActivity) {
-                goToDetailPage(it)
-            }
-            isShowOnlyBookmark.observe(this@MainActivity) {
-                if (it == true) {
-                    binding.floatingBookmarkFilterButton.setImageResource(R.drawable.baseline_bookmark_24)
-                    coinListAdapter.itemList = bookmarkedCoinList.value?: listOf()
-                    coinListAdapter.notifyDataSetChanged()
-                    return@observe
-                }
-                coinListAdapter.itemList = coinList.value?: listOf()
-                coinListAdapter.notifyDataSetChanged()
-                binding.floatingBookmarkFilterButton.setImageResource(R.drawable.baseline_bookmark_border_24)
-            }
-        }
-    }
-
-    private fun onViewModelObserved() {
-        viewModel.getCoinList()
-    }
-
-    private fun goToDetailPage(coin: CoinUIStateModel) {
-        val url = coin.coinrankingUrl
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        startActivity(browserIntent)
-//        Intent(baseContext, CoinDetailActivity::class.java).run {
-//            putExtra("uuid", uuid)
-//            startActivity(this@run)
-//        }
     }
 }

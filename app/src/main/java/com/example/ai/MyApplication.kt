@@ -1,8 +1,7 @@
 package com.example.ai
 
 import android.app.Application
-import android.widget.Toast
-import com.example.ai.di.myAppModules
+import com.example.coinrankingfeature.di.allModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -21,7 +20,7 @@ class MyApplication: Application() {
             // Reference Android context
             androidContext(this@MyApplication)
             // Load modules
-            modules(myAppModules)
+            modules(allModules)
         }
     }
 }
