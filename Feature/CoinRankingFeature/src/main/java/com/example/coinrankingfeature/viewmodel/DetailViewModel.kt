@@ -13,10 +13,10 @@ class DetailViewModel constructor(
     private val _coinDetail = MutableLiveData<CoinUIStateModel>()
     val coinDetail: LiveData<CoinUIStateModel> = _coinDetail
 
-    fun getIndividualCoinDetail(uuid: String) {
-        _coinDetail.value = repository.coinData.value?.data?.coins
-            ?.filter { it.uuId == uuid }
-            ?.map { CoinUIStateModel.buildUIStateModel(it) }
-            ?.first()
-    }
+//    fun getIndividualCoinDetail(uuid: String) {
+//        _coinDetail.value = repository.coinData.value?.data?.coins
+//            ?.filter { it.uuId == uuid }
+//            ?.map { CoinUIStateModel.buildUIStateModel(it) }
+//            ?.first()
+//    }
 }

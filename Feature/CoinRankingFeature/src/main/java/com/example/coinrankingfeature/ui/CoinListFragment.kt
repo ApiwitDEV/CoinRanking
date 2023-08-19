@@ -32,9 +32,18 @@ class CoinListFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeViewModel()
         initView()
-        onViewModelObserved()
+        observeViewModel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.startGetAndUpdateCoinListFromApi()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stopUpdateCoinData()
     }
 
     private fun initView() {
@@ -46,8 +55,8 @@ class CoinListFragment: Fragment() {
                 return false
             }
 
-            override fun onQueryTextChange(p0: String?): Boolean {
-                viewModel.getCoinList(p0?:"")
+            override fun onQueryTextChange(searchValue: String?): Boolean {
+                viewModel.onSearchCoin(searchValue?:"")
                 return false
             }
         })
@@ -56,10 +65,21 @@ class CoinListFragment: Fragment() {
 
     private fun observeViewModel() {
         viewModel.apply {
-//            coinList.observe(this@MainActivity) {
-//                coinListAdapter.itemList = it
-//                coinListAdapter.notifyDataSetChanged()
-//            } X
+            coinList.observe(viewLifecycleOwner) {
+                coinListAdapter.itemList = it
+                coinListAdapter.notifyDataSetChanged()
+            }
+            isShowLoading.observe(viewLifecycleOwner) {
+                if (it) {
+                    //show loading
+                    binding.loading.visibility = View.VISIBLE
+                    binding.rvCoinList.visibility = View.GONE
+                } else {
+                    //hide loading
+                    binding.loading.visibility = View.GONE
+                    binding.rvCoinList.visibility = View.VISIBLE
+                }
+            }
             isShowToast.observe(viewLifecycleOwner) {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
             }
@@ -69,28 +89,16 @@ class CoinListFragment: Fragment() {
             isShowOnlyBookmark.observe(viewLifecycleOwner) {
                 if (it == true) {
                     binding.floatingBookmarkFilterButton.setImageResource(R.drawable.baseline_bookmark_24)
-                    coinListAdapter.itemList = bookmarkedCoinList.value?: listOf()
-                    coinListAdapter.notifyDataSetChanged()
                     return@observe
                 }
-                coinListAdapter.itemList = coinList.value?: listOf()
-                coinListAdapter.notifyDataSetChanged()
                 binding.floatingBookmarkFilterButton.setImageResource(R.drawable.baseline_bookmark_border_24)
             }
         }
-    }
-
-    private fun onViewModelObserved() {
-        viewModel.getCoinList()
     }
 
     private fun goToDetailPage(coin: com.example.coinrankingfeature.uistatemodel.CoinUIStateModel) {
         val url = coin.coinrankingUrl
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         startActivity(browserIntent)
-//        Intent(baseContext, CoinDetailActivity::class.java).run {
-//            putExtra("uuid", uuid)
-//            startActivity(this@run)
-//        }
     }
 }

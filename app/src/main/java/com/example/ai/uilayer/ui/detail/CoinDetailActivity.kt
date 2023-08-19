@@ -33,7 +33,7 @@ class CoinDetailActivity : AppCompatActivity() {
     }
 
     private fun onViewModelObserved() {
-        viewModel.getIndividualCoinDetail(uuid)
+        //viewModel.getIndividualCoinDetail(uuid)
     }
 
     private fun initView() {

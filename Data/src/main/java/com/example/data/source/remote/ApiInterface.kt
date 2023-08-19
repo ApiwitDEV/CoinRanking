@@ -1,6 +1,7 @@
 package com.example.data.source.remote
 
 import com.example.data.model.CoinRankingResponse
+import com.example.data.model.Result
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query

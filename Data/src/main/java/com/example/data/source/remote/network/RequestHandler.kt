@@ -1,5 +1,8 @@
 package com.example.data.source.remote.network
 
+import com.example.data.model.Failure
+import com.example.data.model.Result
+import com.example.data.model.Success
 import kotlinx.coroutines.withTimeout
 
 object RequestHandler {
@@ -28,16 +31,18 @@ object RequestHandler {
 //    }
 
     suspend fun <T: Any> fetchDataFromNetwork(
-        endPoint: T,
-        onSuccess: suspend (T) -> Unit,
-        onFailure: suspend (status: String) -> Unit
-    ) {
-        try {
+        endPoint: suspend () -> T
+//        onSuccess: suspend (T) -> Unit,
+//        onFailure: suspend (status: String) -> Unit
+    ): Result<T> {
+        return try {
             withTimeout(5000) {
-                onSuccess(endPoint)
+                //onSuccess(endPoint)
+                Success(endPoint())
             }
         } catch (error: Exception) {
-            onFailure(error.message.toString())
+            //onFailure(error.message.toString())
+            Failure(error.message.toString())
         }
     }
 }

@@ -26,6 +26,15 @@
         app:layout_constraintStart_toStartOf="@+id/tab_layout"
         app:layout_constraintTop_toTopOf="@+id/tab_layout" />
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_coin_list"
         android:layout_width="match_parent"

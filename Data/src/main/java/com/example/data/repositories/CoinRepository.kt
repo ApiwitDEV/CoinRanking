@@ -1,36 +1,45 @@
 package com.example.data.repositories
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.data.model.CoinRankingResponse
+import com.example.data.model.Result
+import com.example.data.model.Success
+import com.example.data.model.onFailure
+import com.example.data.model.onSuccess
 import com.example.data.source.remote.network.RequestHandler
 import com.example.data.source.local.CoinRoomDatabase
 import com.example.data.source.local.entity.FavoriteCoinEntity
 import com.example.data.source.remote.network.CoinRankingService
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 class CoinRepository constructor(
     private val coinRankingService: CoinRankingService,
     private val favoriteCoinRoomDatabase: CoinRoomDatabase
 ) {
 
-    private val _coinData = MutableLiveData<CoinRankingResponse>()
-    val coinData: LiveData<CoinRankingResponse> = _coinData
+    private var coinData = CoinRankingResponse()
+    private var searchValue = ""
+    private var isCancel = false
 
-    suspend fun getCoinList(
+    fun getCoinList(): CoinRankingResponse {
+        return coinData
+    }
+
+    suspend fun getCoinListFromApi(
         offset: Int,
         limit: Int,
-        search: String = "",
-        handleUIStateWhenSuccess: () -> Unit,
-        handleUIStateWhenFailure: (String) -> Unit
-    ) {
-        RequestHandler.fetchDataFromNetwork(
-            endPoint = coinRankingService.getCoinList(offset, limit, search),
-            onSuccess = { coinRankingResponse ->
-                mapBookmarkedStateToCoinList(coinRankingResponse, getBookmarkedCoin())
-                handleUIStateWhenSuccess()
-            },
-            onFailure = handleUIStateWhenFailure
+        searchValue: String = ""
+    ): Result<CoinRankingResponse> {
+        this.searchValue = searchValue
+        return RequestHandler.fetchDataFromNetwork(
+            endPoint = { coinRankingService.getCoinList(offset, limit, this.searchValue) }
         )
+            .onSuccess { coinRankingResponse ->
+                mapBookmarkedStateToCoinList(coinRankingResponse, getBookmarkedCoin())
+            }
+            .onFailure {
+
+            }
     }
 
     private fun mapBookmarkedStateToCoinList(
@@ -50,7 +59,7 @@ class CoinRepository constructor(
                 }
             }
         }
-        _coinData.value = coinRankingResponse
+        coinData = coinRankingResponse
     }
 
     private suspend fun getBookmarkedCoin(): List<FavoriteCoinEntity> {
@@ -58,25 +67,65 @@ class CoinRepository constructor(
     }
 
     suspend fun bookmarkCoin(
-        uuid: String,
-        updateCoinListUIState: () -> Unit
-    ) {
-        coinData.value?.data?.coins?.forEach {
-            if (it.uuId == uuid) {
-                val favoriteCoinEntity = FavoriteCoinEntity(
-                    uuid = it.uuId!!,
-                    name = it.name,
-                    symbol = it.name,
-                    coinrankingUrl = it.coinrankingUrl
-                )
-                if (it.isFavorite == true) {
-                    favoriteCoinRoomDatabase.coinDao().delete(favoriteCoinEntity)
-                } else {
-                    favoriteCoinRoomDatabase.coinDao().insert(favoriteCoinEntity)
+        uuid: String
+    ): Success<CoinRankingResponse> {
+        coroutineScope {
+            coinData.data?.coins?.forEach {
+                if (it.uuId == uuid) {
+                    val favoriteCoinEntity = FavoriteCoinEntity(
+                        uuid = it.uuId!!,
+                        name = it.name,
+                        symbol = it.name,
+                        coinrankingUrl = it.coinrankingUrl
+                    )
+                    if (it.isFavorite == true) {
+                        favoriteCoinRoomDatabase.coinDao().delete(favoriteCoinEntity)
+                    } else {
+                        favoriteCoinRoomDatabase.coinDao().insert(favoriteCoinEntity)
+                    }
                 }
             }
+            mapBookmarkedStateToCoinList(coinData, getBookmarkedCoin())
         }
-        mapBookmarkedStateToCoinList(coinData.value!!, getBookmarkedCoin())
-        updateCoinListUIState()
+        return Success(coinData)
+    }
+
+    suspend fun startUpdateCoinData(
+        updateUIOnUpdateCoinDataSuccess: (CoinRankingResponse) -> Unit = {},
+        updateUIOnUpdateCoinDataFail: (String) -> Unit = {}
+    ) {
+        isCancel = false
+        updateCoinData(
+            updateUIOnUpdateCoinDataSuccess,
+            updateUIOnUpdateCoinDataFail
+        )
+    }
+
+    fun stopUpdateCoinData() {
+        isCancel = true
+    }
+
+    private suspend fun updateCoinData(
+        updateUIOnUpdateCoinDataSuccess: (CoinRankingResponse) -> Unit = {},
+        updateUIOnUpdateCoinDataFail: (String) -> Unit = {}
+    ) {
+        delay(10000)
+        if (!isCancel) {
+            getCoinListFromApi(0, 100, searchValue)
+                .onSuccess {
+                    updateUIOnUpdateCoinDataSuccess(it)
+                    updateCoinData(
+                        updateUIOnUpdateCoinDataSuccess,
+                        updateUIOnUpdateCoinDataFail
+                    )
+                }
+                .onFailure {
+                    updateUIOnUpdateCoinDataFail(it)
+                    updateCoinData(
+                        updateUIOnUpdateCoinDataSuccess,
+                        updateUIOnUpdateCoinDataFail
+                    )
+                }
+        }
     }
 }

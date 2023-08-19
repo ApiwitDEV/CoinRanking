@@ -33,26 +33,4 @@ data class Coin(
     var _24hVolume: String? = null,
     @SerializedName("isFavorite")
     var isFavorite: Boolean? = null
-) {
-//    fun convertToCoinUIStateModel(
-//        handleOnClickEvent:(coin: CoinUIStateModel) -> Unit = {},
-//        handleOnClickBookmarkEvent:(uuid: String) -> Unit = {}) = CoinUIStateModel(
-//        uuId = this@Coin.uuId,
-//        symbol = this@Coin.symbol,
-//        name= this@Coin.name,
-//        color = this@Coin.color,
-//        iconUrl = this@Coin.iconUrl,
-//        marketCap = this@Coin.marketCap,
-//        price = this@Coin.price,
-//        btcPrice = this@Coin.btcPrice,
-//        listedAt = this@Coin.listedAt,
-//        change = this@Coin.change,
-//        rank = this@Coin.rank,
-//        sparkLine = this@Coin.sparkLine,
-//        coinrankingUrl = this@Coin.coinrankingUrl,
-//        _24hVolume = this@Coin._24hVolume,
-//        isFavorite = this@Coin.isFavorite,
-//        clickEvent = handleOnClickEvent,
-//        clickBookmarkEvent = handleOnClickBookmarkEvent
-//    )
-}
+)

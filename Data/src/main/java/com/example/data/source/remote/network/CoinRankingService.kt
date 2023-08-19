@@ -1,6 +1,7 @@
 package com.example.data.source.remote.network
 
 import com.example.data.model.CoinRankingResponse
+import com.example.data.model.Result
 import com.example.data.source.remote.ApiInterface
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
